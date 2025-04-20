@@ -148,3 +148,9 @@ Scenario: Show pie chart of event genres
 3. Deploy updates via Vercel.  
 4. Begin setting up AWS for next Exercise on serverless functions.
 
+## 🧭 Meet App Architecture (Serverless)
+
+The following diagram illustrates the architecture of the Meet App using serverless functions, OAuth, and external APIs:
+
+![Meet App Serverless Architecture](./src/assets/struc.png)
+

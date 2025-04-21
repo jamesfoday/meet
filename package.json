@@ -22,5 +22,18 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
     "vite": "^5.3.1"
-  }
+  },
+  "description": "**Meet** is a serverless Progressive Web App (PWA) built with React and Vite, developed using Test-Driven Development (TDD). It fetches upcoming events via the Google Calendar API, supports offline usage, and is deployed on Vercel.",
+  "main": "vite.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamesfoday/meet.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jamesfoday/meet/issues"
+  },
+  "homepage": "https://github.com/jamesfoday/meet#readme"
 }

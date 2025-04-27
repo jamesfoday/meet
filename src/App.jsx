@@ -1,35 +1,38 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import { getEvents, extractLocations } from './api';
+import CitySearch from './components/CitySearch';
+import EventList from './components/EventList';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [events, setEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [locations, setLocations] = useState([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const allEvents = await getEvents();
+      const allLocations = extractLocations(allEvents);
+      setEvents(allEvents);
+      setLocations(allLocations);
+      setFilteredEvents(allEvents); // Show all events initially
+    }
+    fetchData();
+  }, []);
+
+  const handleCitySelect = (city) => {
+    const cityEvents = city === 'See all cities'
+      ? events
+      : events.filter((event) => event.location === city);
+
+    setFilteredEvents(cityEvents);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React  </h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="App">
+      <CitySearch allLocations={locations} onCitySelect={handleCitySelect} />
+      <EventList events={filteredEvents} />
+    </div>
+  );
 }
 
-export default App
+export default App;

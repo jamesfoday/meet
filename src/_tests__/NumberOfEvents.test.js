@@ -20,7 +20,7 @@ describe('<NumberOfEvents /> component', () => {
 
     test('user can change number of events', async () => {
         const user = userEvent.setup();
-        let numberOfEvents = 32;
+        let numberOfEvents = 10;
         const setCurrentNOE = (value) => {
             numberOfEvents = value;
         };

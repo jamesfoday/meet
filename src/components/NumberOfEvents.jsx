@@ -2,10 +2,12 @@ import React from 'react';
 
 const NumberOfEvents = ({ currentNOE, setCurrentNOE }) => {
     const handleInputChanged = (event) => {
-        const value = parseInt(event.target.value, 10);
+        const value = event.target.value;
 
-        if (!isNaN(value)) {
-            setCurrentNOE(value);
+        if (value === "") {
+            setCurrentNOE("");
+        } else if (!isNaN(parseInt(value, 10))) {
+            setCurrentNOE(parseInt(value, 10));
         }
     };
 

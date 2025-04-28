@@ -40,7 +40,7 @@ describe('<App /> integration', () => {
         const numberOfEventsInput = container.querySelector('#number-of-events input');
 
         await user.clear(numberOfEventsInput);
-        await user.type(numberOfEventsInput, '10');
+        await user.type(numberOfEventsInput, "{backspace}{backspace}10");
 
         const EventListDOM = container.querySelector('#event-list');
         const allEventListItems = within(EventListDOM).queryAllByRole('listitem');

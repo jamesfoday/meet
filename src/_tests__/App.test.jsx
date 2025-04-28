@@ -1,43 +1,57 @@
 import '@testing-library/jest-dom';
 import React from 'react';
-import { render, waitFor, screen } from '@testing-library/react';
-import App from '../App';
-import { getEvents } from '../api';
-import { act } from 'react';
+import { render, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { getEvents } from '../api';
+import App from '../App';
 
+// describe('<App /> component', () => {
 
+// });
 
-jest.mock('../api');
+describe('<App /> integration', () => {
+    test('renders a list of events matching the city selected by the user', async () => {
+        const user = userEvent.setup();
+        const AppComponent = render(<App />);
+        const AppDOM = AppComponent.container.firstChild;
 
-describe('Integration test: App + CitySearch + EventList', () => {
-    test('renders events matching the city selected by user', async () => {
-        getEvents.mockResolvedValue([
-            { id: 1, title: 'Event 1 in Berlin - Berlin, Germany', location: 'Berlin, Germany' },
-            { id: 2, title: 'Event 2 in Berlin - Berlin, Germany', location: 'Berlin, Germany' },
+        const CitySearchDOM = AppDOM.querySelector('#city-search');
+        const CitySearchInput = within(CitySearchDOM).queryByRole('textbox');
 
-        ]);
+        await user.type(CitySearchInput, "Berlin");
+        const berlinSuggestionItem = within(CitySearchDOM).queryByText('Berlin, Germany');
+        await user.click(berlinSuggestionItem);
 
-        render(<App />);
+        const EventListDOM = AppDOM.querySelector('#event-list');
+        const allRenderedEventItems = within(EventListDOM).queryAllByRole('listitem');
 
-        const cityInput = await screen.findByPlaceholderText('Search for a city');
+        const allEvents = await getEvents();
+        const berlinEvents = allEvents.filter(
+            event => event.location === 'Berlin, Germany'
+        );
 
-        await act(async () => {
-            await userEvent.type(cityInput, 'Berlin');
-        });
+        expect(allRenderedEventItems.length).toBe(berlinEvents.length);
 
-        const suggestionItems = await screen.findAllByRole('listitem');
-        await act(async () => {
-            await userEvent.click(suggestionItems[0]); // click "Berlin, Germany"
-        });
-
-
-        const eventItems = await waitFor(() => screen.getAllByRole('listitem'));
-
-
-        expect(eventItems.length).toBeGreaterThan(0);
-        eventItems.forEach((item) => {
-            expect(item.textContent).toMatch(/Berlin/i);
+        allRenderedEventItems.forEach(event => {
+            expect(event.textContent).toContain('Berlin, Germany');
         });
     });
+
+    test('user can change the number of events displayed', async () => {
+        const user = userEvent.setup();
+        const AppComponent = render(<App />);
+        const AppDOM = AppComponent.container.firstChild;
+
+        const numberOfEventsDOM = AppDOM.querySelector('#number-of-events');
+        const numberInput = within(numberOfEventsDOM).queryByRole('textbox');
+
+        await user.clear(numberInput);
+        await user.type(numberInput, '10');
+
+        const eventListDOM = AppDOM.querySelector('#event-list');
+        const allEventListItems = within(eventListDOM).queryAllByRole('listitem');
+
+        expect(allEventListItems.length).toBeLessThanOrEqual(10);
+    });
+
 });

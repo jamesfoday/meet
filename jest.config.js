@@ -1,6 +1,9 @@
-export default {
-    testEnvironment: "jsdom",
+module.exports = {
+    moduleNameMapper: {
+        '\\.(css|less)$': '<rootDir>/src/__mocks__/styleMock.js',
+    },
+    testEnvironment: 'jsdom',
     collectCoverage: true,
-    coverageDirectory: "coverage",
-    coverageReporters: ["text", "lcov"],
+    coverageDirectory: 'coverage',
+    coverageReporters: ['text', 'lcov'],
 };

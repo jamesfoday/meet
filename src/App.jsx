@@ -1,38 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { getEvents, extractLocations } from './api';
+import React, { useEffect, useState } from 'react';
 import CitySearch from './components/CitySearch';
 import EventList from './components/EventList';
+import NumberOfEvents from './components/NumberOfEvents';
+import { getEvents, extractLocations } from './api';
+import './App.css';
 
-function App() {
+const App = () => {
   const [events, setEvents] = useState([]);
-  const [filteredEvents, setFilteredEvents] = useState([]);
-  const [locations, setLocations] = useState([]);
+  const [currentNOE, setCurrentNOE] = useState(32);
+  const [allLocations, setAllLocations] = useState([]);
+  const [currentCity, setCurrentCity] = useState('See all cities');
 
   useEffect(() => {
-    async function fetchData() {
-      const allEvents = await getEvents();
-      const allLocations = extractLocations(allEvents);
-      setEvents(allEvents);
-      setLocations(allLocations);
-      setFilteredEvents(allEvents); // Show all events initially
-    }
     fetchData();
-  }, []);
+  }, [currentCity]); // fetchData when city changes
 
-  const handleCitySelect = (city) => {
-    const cityEvents = city === 'See all cities'
-      ? events
-      : events.filter((event) => event.location === city);
-
-    setFilteredEvents(cityEvents);
+  const fetchData = async () => {
+    const allEvents = await getEvents();
+    const filteredEvents = currentCity === 'See all cities'
+      ? allEvents
+      : allEvents.filter(event => event.location === currentCity);
+    setEvents(filteredEvents.slice(0, currentNOE));
+    setAllLocations(extractLocations(allEvents));
   };
 
   return (
     <div className="App">
-      <CitySearch allLocations={locations} onCitySelect={handleCitySelect} />
-      <EventList events={filteredEvents} />
+      <CitySearch allLocations={allLocations} setCurrentCity={setCurrentCity} />
+      <NumberOfEvents />
+      <EventList events={events} />
     </div>
   );
-}
+};
 
 export default App;

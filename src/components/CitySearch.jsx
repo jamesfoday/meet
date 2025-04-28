@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const CitySearch = ({ allLocations, onCitySelect }) => {
+const CitySearch = ({ allLocations, setCurrentCity }) => {
     const [query, setQuery] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
+    useEffect(() => {
+        setSuggestions(allLocations);
+    }, [`${allLocations}`]); // react to prop changes
+
     const handleInputChanged = (event) => {
         const value = event.target.value;
         setQuery(value);
-
         const filteredSuggestions = allLocations
-            ? allLocations.filter((city) =>
-                city.toUpperCase().includes(value.toUpperCase())
-            )
+            ? allLocations.filter(location => location.toUpperCase().indexOf(value.toUpperCase()) > -1)
             : [];
         setSuggestions(filteredSuggestions);
-        setShowSuggestions(true);
     };
 
     const handleItemClicked = (event) => {
         const value = event.target.textContent;
         setQuery(value);
         setShowSuggestions(false);
-        onCitySelect(value);
+        setCurrentCity(value);
     };
 
     return (
@@ -32,22 +32,17 @@ const CitySearch = ({ allLocations, onCitySelect }) => {
                 className="city"
                 placeholder="Search for a city"
                 value={query}
-                onFocus={() => setShowSuggestions(true)}
                 onChange={handleInputChanged}
+                onFocus={() => setShowSuggestions(true)}
             />
             {showSuggestions && (
                 <ul className="suggestions">
-                    {suggestions.map((suggestion) => (
-                        <li key={suggestion} onClick={handleItemClicked}>
+                    {suggestions.map(suggestion => (
+                        <li onClick={handleItemClicked} key={suggestion}>
                             {suggestion}
                         </li>
                     ))}
-                    {/* Only show "See all cities" if suggestions exist */}
-                    {suggestions.length > 0 && (
-                        <li key="See all cities" onClick={handleItemClicked}>
-                            <b>See all cities</b>
-                        </li>
-                    )}
+                    <li key="See all cities" onClick={handleItemClicked}><b>See all cities</b></li>
                 </ul>
             )}
         </div>

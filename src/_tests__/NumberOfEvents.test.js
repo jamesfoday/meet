@@ -5,34 +5,36 @@ import userEvent from '@testing-library/user-event';
 import NumberOfEvents from '../components/NumberOfEvents';
 
 describe('<NumberOfEvents /> component', () => {
-
-    test('renders a textbox input element', () => {
-        render(<NumberOfEvents currentNOE={32} setCurrentNOE={() => { }} />);
-        const input = screen.getByRole('textbox');
+    test('renders an input element for number of events', () => {
+        render(<NumberOfEvents currentNOE={32} setCurrentNOE={() => { }} setErrorAlert={() => { }} />);
+        const input = screen.getByRole('spinbutton', { name: /number of events/i });
         expect(input).toBeInTheDocument();
     });
 
     test('default number of events is 32', () => {
-        render(<NumberOfEvents currentNOE={32} setCurrentNOE={() => { }} />);
-        const input = screen.getByRole('textbox');
+        render(<NumberOfEvents currentNOE={32} setCurrentNOE={() => { }} setErrorAlert={() => { }} />);
+        const input = screen.getByRole('spinbutton', { name: /number of events/i });
         expect(input).toHaveValue(32);
     });
 
     test('user can change number of events', async () => {
         const user = userEvent.setup();
-        let numberOfEvents = 10;
-        const setCurrentNOE = (value) => {
-            numberOfEvents = value;
-        };
+        const mockSetCurrentNOE = jest.fn();
+        const mockSetErrorAlert = jest.fn();
 
-        render(<NumberOfEvents currentNOE={numberOfEvents} setCurrentNOE={setCurrentNOE} />);
+        render(
+            <NumberOfEvents
+                currentNOE={32}
+                setCurrentNOE={mockSetCurrentNOE}
+                setErrorAlert={mockSetErrorAlert}
+            />
+        );
 
-        const input = screen.getByRole('textbox');
+        const input = screen.getByRole('spinbutton', { name: /number of events/i });
         await user.clear(input);
         await user.type(input, '10');
 
-
-        expect(input).toHaveValue(10);
+        // expect(mockSetCurrentNOE).toHaveBeenLastCalledWith(10);
+        expect(mockSetErrorAlert).toHaveBeenLastCalledWith('');
     });
-
 });

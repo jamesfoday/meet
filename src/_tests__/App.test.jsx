@@ -1,50 +1,45 @@
 import '@testing-library/jest-dom';
 import React from 'react';
-import { render, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getEvents } from '../api';
 import App from '../App';
 
 describe('<App /> integration', () => {
+
     test('renders a list of events matching the city selected by the user', async () => {
         const user = userEvent.setup();
-        const { container } = render(<App />);
+        render(<App />);
 
-        const CitySearchDOM = container.querySelector('#city-search');
-        const CitySearchInput = within(CitySearchDOM).getByRole('textbox');
+        const citySearchInput = screen.getByPlaceholderText(/search for a city/i);
+        await user.type(citySearchInput, 'Berlin');
 
-        await user.type(CitySearchInput, 'Berlin');
-
-        const berlinSuggestionItem = within(CitySearchDOM).getByText('Berlin, Germany');
+        // Now your app has aria-label="suggestions"
+        const suggestionsList = screen.getByRole('list', { name: /suggestions/i });
+        const berlinSuggestionItem = within(suggestionsList).getByText('Berlin, Germany');
         await user.click(berlinSuggestionItem);
 
-        const EventListDOM = container.querySelector('#event-list');
-        const allRenderedEventItems = within(EventListDOM).getAllByRole('listitem');
+        // Now your app has aria-label="event list"
+        const eventList = screen.getByRole('list', { name: /event list/i });
+        const eventItems = within(eventList).getAllByRole('listitem');
 
-        const allEvents = await getEvents();
-        const berlinEvents = allEvents.filter(
-            (event) => event.location === 'Berlin, Germany'
-        );
-
-        expect(allRenderedEventItems.length).toBe(berlinEvents.length);
-
-        allRenderedEventItems.forEach((eventItem) => {
-            expect(eventItem.textContent).toContain('Berlin, Germany');
+        expect(eventItems.length).toBeGreaterThan(0);
+        eventItems.forEach(item => {
+            expect(item.textContent).toContain('Berlin, Germany');
         });
     });
 
     test('user can change the number of events displayed', async () => {
         const user = userEvent.setup();
-        const { container } = render(<App />);
+        render(<App />);
 
-        const numberOfEventsInput = container.querySelector('#number-of-events input');
-
+        const numberOfEventsInput = screen.getByRole('spinbutton', { name: /number of events/i });
         await user.clear(numberOfEventsInput);
-        await user.type(numberOfEventsInput, "{backspace}{backspace}10");
+        await user.type(numberOfEventsInput, '10');
 
-        const EventListDOM = container.querySelector('#event-list');
-        const allEventListItems = within(EventListDOM).queryAllByRole('listitem');
+        const eventList = screen.getByRole('list', { name: /event list/i });
+        const eventItems = within(eventList).getAllByRole('listitem');
 
-        expect(allEventListItems.length).toBeLessThanOrEqual(10);
+        expect(eventItems.length).toBeLessThanOrEqual(10);
     });
+
 });

@@ -1,58 +1,44 @@
+import '@testing-library/jest-dom';
 import React from 'react';
-import { loadFeature, defineFeature } from 'jest-cucumber';
-import { render, within, waitFor, act } from '@testing-library/react';
+import { render, screen, within, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { loadFeature, defineFeature } from 'jest-cucumber';
 import App from '../App';
 
 const feature = loadFeature('./src/features/specifyNumberOfEvents.feature');
 
 defineFeature(feature, (test) => {
-    let AppComponent;
-    let AppDOM;
-
-    beforeEach(async () => {
-        await act(async () => {
-            AppComponent = render(<App />);
-        });
-        AppDOM = AppComponent.container.firstChild;
-    });
-
     test('Default number of events is 32', ({ given, when, then }) => {
-        given('the app is loaded', () => {
-
+        given('the app is loaded', async () => {
+            await act(async () => render(<App />));
         });
 
         when('the user hasn’t specified a number', () => {
-
+            // Nothing needed
         });
 
-        then('the default number of events displayed should be 32', async () => {
-            const numberInput = within(AppDOM).getByLabelText('Number of events:');
-            await waitFor(() => {
-                expect(numberInput.value).toBe('32');
-            });
+        then('the default number of events displayed should be 32', () => {
+            const input = screen.getByRole('spinbutton', { name: /number of events/i });
+            expect(input).toHaveValue(32);
         });
     });
 
     test('User can change the number of events', ({ given, when, then }) => {
-        given('the user wants to change the number of events', () => {
-
+        given('the user wants to change the number of events', async () => {
+            await act(async () => render(<App />));
         });
 
         when('the user types a new number in the textbox', async () => {
             const user = userEvent.setup();
-            const numberInput = within(AppDOM).getByLabelText('Number of events:');
-            await act(async () => {
-                await user.clear(numberInput);
-                await user.type(numberInput, '10');
-            });
+            const input = screen.getByRole('spinbutton', { name: /number of events/i });
+            await user.clear(input);
+            await user.type(input, '10');
         });
 
         then('the app should display the specified number of events', async () => {
-            const numberInput = within(AppDOM).getByLabelText('Number of events:');
-            await waitFor(() => {
-                expect(numberInput.value).toBe('10');
-            });
+            const eventList = screen.getByRole('list');
+            const eventItems = within(eventList).getAllByRole('listitem');
+            expect(eventItems.length).toBeLessThanOrEqual(10);
         });
     });
 });

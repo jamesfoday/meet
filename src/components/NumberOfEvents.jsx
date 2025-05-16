@@ -1,29 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
-const NumberOfEvents = ({ currentNOE, setCurrentNOE }) => {
+const NumberOfEvents = ({ setCurrentNOE, setErrorAlert }) => {
+    const [number, setNumber] = useState(32);
+
     const handleInputChanged = (event) => {
         const value = event.target.value;
+        setNumber(value);
 
-        if (value === "") {
-            setCurrentNOE("");
-        } else if (!isNaN(parseInt(value, 10))) {
-            setCurrentNOE(parseInt(value, 10));
+        if (value < 1 || value > 100) {
+            setErrorAlert('Please enter a number between 1 and 100.');
+        } else {
+            setErrorAlert(''); // Clear error
+            setCurrentNOE(value);
         }
     };
 
     return (
-        <div id="number-of-events">
-            <label htmlFor="event-count">Number of events:</label>
+        <div className="number-of-events">
+            <label htmlFor="numberOfEvents">Number of events:</label>
             <input
+                id="numberOfEvents"
                 type="number"
-                id="event-count"
-                value={currentNOE}
+                className="number"
+                value={number}
                 onChange={handleInputChanged}
-                role="textbox"
                 min="1"
+                max="100"
             />
         </div>
     );
+};
+
+NumberOfEvents.propTypes = {
+    setCurrentNOE: PropTypes.func.isRequired,
+    setErrorAlert: PropTypes.func.isRequired,
 };
 
 export default NumberOfEvents;

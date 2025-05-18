@@ -44,6 +44,34 @@ export default defineConfig({
           }
         ]
       },
+      workbox: {
+        runtimeCaching: [
+          {
+            // Caches your events API calls when online, and serves from cache when offline
+            urlPattern: /^https:\/\/bhp1laje7g\.execute-api\.eu-central-1\.amazonaws\.com\/dev\/api\/get-events/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'events-cache',
+              expiration: {
+                maxEntries: 30,
+                maxAgeSeconds: 60 * 60 * 24,
+              },
+            },
+          },
+          {
+
+            urlPattern: /.*\.png$/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'images-cache',
+              expiration: {
+                maxEntries: 50,
+              },
+            },
+          }
+        ],
+      },
+
       devOptions: {
         enabled: true
       }

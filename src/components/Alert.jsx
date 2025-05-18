@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+// Base Alert component
 class Alert extends Component {
     constructor(props) {
         super(props);
@@ -32,6 +33,7 @@ class Alert extends Component {
     }
 }
 
+// InfoAlert extending Alert
 class InfoAlert extends Alert {
     constructor(props) {
         super(props);
@@ -44,6 +46,7 @@ class InfoAlert extends Alert {
     }
 }
 
+// ErrorAlert extending Alert
 class ErrorAlert extends Alert {
     constructor(props) {
         super(props);
@@ -56,4 +59,17 @@ class ErrorAlert extends Alert {
     }
 }
 
-export { InfoAlert, ErrorAlert };
+// ✅ New WarningAlert extending Alert
+class WarningAlert extends Alert {
+    constructor(props) {
+        super(props);
+        this.color = 'rgb(255, 165, 0)'; // orange
+        this.bgColor = 'rgb(255, 240, 200)';
+    }
+
+    render() {
+        return super.render();
+    }
+}
+
+export { InfoAlert, ErrorAlert, WarningAlert };
